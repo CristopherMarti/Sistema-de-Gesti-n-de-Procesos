@@ -1,1 +1,2 @@
-//Trabajo colaborativo C++ Equipo numero 04
+//Trabajo colaborativo C++ Equipo numero 04 
+//hola mundo cls
