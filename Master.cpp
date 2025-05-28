@@ -6,6 +6,7 @@ using namespace std;
 // ----------- Lista enlazada de procesos -----------
 
 
+<<<<<<< HEAD
 // ----------- Pila personalizada -----------
 
 
@@ -17,3 +18,7 @@ using namespace std;
 
 
 // ========== MENÚ PRINCIPAL ORIGINAL ===========
+=======
+//hola miss un gustito :3 
+//Miequipo cris oliver y tati
+>>>>>>> 9f2cbc9cd66e117f7cbbf95890c5e3bd03a952bf
