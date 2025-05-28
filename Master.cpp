@@ -61,6 +61,27 @@ public:
         }
     }
 
+    void mostrarTodos() {
+        NodoProceso* actual = cabeza;
+        while (actual) {
+            mostrar(actual);
+            cout << "-------------------\n";
+            actual = actual->siguiente;
+        }
+    }
+
+    void mostrar(NodoProceso* p) {
+        if (p) {
+            cout << "ID: " << p->id << "\nNombre: " << p->nombre << "\nPrioridad: "
+                 << p->prioridad << "\nMemoria: " << p->tamanoMemoria << " KB"
+                 << "\nMemoria Asignada: " << p->memoriaAsignada << " KB"
+                 << "\nEstado: " << p->estado << "\n";
+        }
+    }
+
+    NodoProceso* getCabeza() { return cabeza; }
+};
+
 
 // ----------- Pila personalizada -----------
 
