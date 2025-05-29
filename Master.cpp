@@ -84,51 +84,61 @@ public:
 
 
 // ----------- Pila  -----------
+// Definición de una estructura Nodo que representa un proceso en memoria.
+// Cada nodo contiene un identificador de proceso (id) y un puntero al siguiente nodo.
 struct Nodo {
-    int id;
-    Nodo* siguiente;
+    int id;           // Identificador del proceso.
+    Nodo* siguiente;  // Puntero al siguiente nodo en la pila.
 };
 
+// Definición de la clase PilaMemoria que simula una pila para gestionar procesos en memoria.
 class PilaMemoria {
 private:
-    Nodo* cima;
-    int maxTam;
-    int tamActual;
+    Nodo* cima;       // Puntero al nodo en la cima de la pila (último nodo agregado).
+    int maxTam;       // Tamaño máximo permitido para la pila (límite de procesos en memoria).
+    int tamActual;    // Número actual de procesos en la pila.
 
 public:
+    // Constructor: inicializa la pila vacía y define el límite de procesos.
     PilaMemoria(int limite) : cima(NULL), maxTam(limite), tamActual(0) {}
 
+    // Método para verificar si la pila está llena.
     bool estaLlena() { return tamActual >= maxTam; }
+
+    // Método para verificar si la pila está vacía.
     bool estaVacia() { return cima == NULL; }
 
+    // Método para agregar un nuevo proceso (nodo) a la pila.
     void push(int id) {
         if (estaLlena()) {
-            cout << "Pila de memoria llena.\n";
+            cout << "Pila de memoria llena.\n"; // Mensaje si ya no se pueden agregar procesos.
             return;
         }
+        // Se crea un nuevo nodo con el id proporcionado y se enlaza a la cima actual.
         Nodo* nuevo = new Nodo{id, cima};
-        cima = nuevo;
-        tamActual++;
+        cima = nuevo;   // La cima ahora apunta al nuevo nodo.
+        tamActual++;    // Se incrementa el contador de procesos.
     }
 
+    // Método para eliminar el proceso en la cima de la pila (último que entró).
     void pop() {
-        if (estaVacia()) return;
-        Nodo* temp = cima;
-        cima = cima->siguiente;
-        delete temp;
-        tamActual--;
+        if (estaVacia()) return;  // Si la pila está vacía, no hay nada que eliminar.
+        Nodo* temp = cima;        // Se guarda el nodo actual de la cima para eliminarlo.
+        cima = cima->siguiente;   // La cima ahora apunta al nodo siguiente.
+        delete temp;              // Se libera la memoria del nodo anterior.
+        tamActual--;              // Se decrementa el contador de procesos.
     }
 
+    // Método para mostrar todos los procesos actualmente en la pila.
     void mostrar() {
-        Nodo* actual = cima;
+        Nodo* actual = cima;  // Comienza desde la cima.
         cout << "Procesos en memoria (de cima a base):\n";
-        while (actual) {
+        while (actual) {      // Recorre la pila hasta llegar al fondo (NULL).
             cout << "Proceso ID: " << actual->id << endl;
             actual = actual->siguiente;
         }
     }
 };
-
 // ----------- Cola -----------
 struct NodoCola {
     int id;
