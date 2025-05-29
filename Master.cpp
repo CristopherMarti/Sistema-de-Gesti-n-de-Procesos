@@ -131,6 +131,58 @@ public:
 
 // ----------- Cola -----------
 
+struct NodoCola {
+    int id;
+    int prioridad;
+    NodoCola* siguiente;
+};
+
+class ColaPrioridad {
+private:
+    NodoCola* frente;
+    NodoCola* final;
+
+public:
+    ColaPrioridad() : frente(NULL), final(NULL) {}
+
+    void encolar(int id, int prioridad) {
+        NodoCola* nuevo = new NodoCola{id, prioridad, NULL};
+        if (!frente || prioridad > frente->prioridad) {
+            nuevo->siguiente = frente;
+            frente = nuevo;
+        } else {
+            NodoCola* actual = frente;
+            while (actual->siguiente && actual->siguiente->prioridad >= prioridad)
+                actual = actual->siguiente;
+            nuevo->siguiente = actual->siguiente;
+            actual->siguiente = nuevo;
+        }
+    }
+
+    void desencolar() {
+        if (!frente) {
+            cout << "Cola vacía.\n";
+            return;
+        }
+        NodoCola* temp = frente;
+        frente = frente->siguiente;
+        cout << "Ejecutando proceso con ID: " << temp->id << " y prioridad: " << temp->prioridad << endl;
+        delete temp;
+    }
+
+    void mostrar() {
+        NodoCola* actual = frente;
+        int pos = 1;
+        while (actual) {
+            cout << pos++ << ". Proceso ID: " << actual->id << " - Prioridad: " << actual->prioridad << endl;
+            actual = actual->siguiente;
+        }
+    }
+
+    bool estaVacia() { return frente == NULL; }
+};
+
+
 
 // ================= GESTOR DE PROCESOS ===================
 
