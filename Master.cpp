@@ -161,52 +161,52 @@ struct NodoCola {
     NodoCola* siguiente; // Puntero al siguiente nodo en la cola
 };
 
-class ColaPrioridad {
-private:
-    NodoCola* frente;  // Puntero al inicio de la cola
-    NodoCola* final;   // Puntero al final de la cola (no usado en lógica actual)
+// Variables globales que representan la cola
+NodoCola* frente = NULL;
+NodoCola* final = NULL; // No se usa en esta lógica, pero queda declarado igual
 
-public:
-    ColaPrioridad() : frente(NULL), final(NULL) {} // Constructor que inicializa ambos punteros a NULL
+// Función para encolar un proceso según su prioridad (de mayor a menor)
+void encolar(int id, int prioridad) {
+    NodoCola* nuevo = new NodoCola{id, prioridad, NULL};
 
-    void encolar(int id, int prioridad) {
-        NodoCola* nuevo = new NodoCola{id, prioridad, NULL}; // Crear nuevo nodo con datos
-        // Si la cola está vacía o la prioridad es mayor que la del frente
-        if (!frente || prioridad > frente->prioridad) {
-            nuevo->siguiente = frente;  // Nuevo nodo apunta al frente actual
-            frente = nuevo;             // Nuevo nodo se vuelve el frente
-        } else {
-            NodoCola* actual = frente;
-            // Buscar lugar correcto para insertar según prioridad (de mayor a menor)
-            while (actual->siguiente && actual->siguiente->prioridad >= prioridad)
-                actual = actual->siguiente;
-            nuevo->siguiente = actual->siguiente; // Enlazar nuevo nodo al siguiente
-            actual->siguiente = nuevo;             // Enlazar nodo actual al nuevo
-        }
-    }
-
-    void desencolar() {
-        if (!frente) {              // Si la cola está vacía
-            cout << "Cola vacía.\n"; 
-            return;
-        }
-        NodoCola* temp = frente;    // Guardar nodo que se va a desencolar
-        frente = frente->siguiente; // Avanzar el frente
-        cout << "Ejecutando proceso con ID: " << temp->id << " y prioridad: " << temp->prioridad << endl;
-        delete temp;                // Liberar memoria del nodo desencolado
-    }
-
-    void mostrar() {
-        NodoCola* actual = frente;  // Comenzar desde el frente
-        int pos = 1;
-        while (actual) {            // Recorrer todos los nodos
-            cout << pos++ << ". Proceso ID: " << actual->id << " - Prioridad: " << actual->prioridad << endl;
+    if (!frente || prioridad > frente->prioridad) {
+        nuevo->siguiente = frente;
+        frente = nuevo;
+    } else {
+        NodoCola* actual = frente;
+        while (actual->siguiente && actual->siguiente->prioridad >= prioridad)
             actual = actual->siguiente;
-        }
+        nuevo->siguiente = actual->siguiente;
+        actual->siguiente = nuevo;
     }
+}
 
-    bool estaVacia() { return frente == NULL; } // Verifica si la cola está vacía
-};
+// Función para desencolar el proceso de mayor prioridad (el que está al frente)
+void desencolar() {
+    if (!frente) {
+        cout << "Cola vacía.\n";
+        return;
+    }
+    NodoCola* temp = frente;
+    frente = frente->siguiente;
+    cout << "Ejecutando proceso con ID: " << temp->id << " y prioridad: " << temp->prioridad << endl;
+    delete temp;
+}
+
+// Función para mostrar solo el primer proceso en la cola
+void mostrar() {
+    if (frente) {
+        cout << "Proceso ID: " << frente->id << " - Prioridad: " << frente->prioridad << endl;
+    } else {
+        cout << "Cola vacía." << endl;
+    }
+}
+
+// Función para saber si la cola está vacía
+bool estaVacia() {
+    return frente == NULL;
+}
+
 
 // ================= GESTOR DE PROCESOS ===================
 // Clase que gestiona la lista de procesos, pila de memoria y cola de prioridad
