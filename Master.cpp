@@ -130,7 +130,6 @@ public:
 };
 
 // ----------- Cola -----------
-
 struct NodoCola {
     int id;
     int prioridad;
@@ -181,9 +180,6 @@ public:
 
     bool estaVacia() { return frente == NULL; }
 };
-
-
-
 // ================= GESTOR DE PROCESOS ===================
 
 
