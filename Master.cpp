@@ -280,8 +280,9 @@ public:
 
 // ================= FUNCION PRINCIPAL ===================
 
+    // Este menú se muestra cada vez que el usuario debe elegir una acción
 int main() {
-    GestorProcesos gestor(1024); // 1024 KB de memoria total
+    GestorProcesos gestor(1024); // Creamos un objeto del gestor con 1024 KB de memoria disponible
     int opcion;
 
     do {
@@ -297,22 +298,21 @@ int main() {
         cout << "9. Mostrar cola de prioridad\n";
         cout << "10. Salir\n";
         cout << "Seleccione una opción: ";
-        cin >> opcion;
-
+        
         switch (opcion) {
-            case 1: gestor.insertarProceso(); break;
-            case 2: gestor.eliminarProceso(); break;
-            case 3: gestor.buscarProceso(); break;
-            case 4: gestor.modificarPrioridad(); break;
-            case 5: gestor.asignarMemoria(); break;
-            case 6: gestor.liberarMemoria(); break;
-            case 7: gestor.ejecutarProceso(); break;
-            case 8: gestor.mostrarLista(); break;
-            case 9: gestor.mostrarCola(); break;
+            case 1: gestor.insertarProceso(); break; // Crea un nuevo proceso
+            case 2: gestor.eliminarProceso(); break;  // Elimina un proceso existente
+            case 3: gestor.buscarProceso(); break; // Busca un proceso por ID
+            case 4: gestor.modificarPrioridad(); break;  // Cambia la prioridad de un proceso
+            case 5: gestor.asignarMemoria(); break;     // Asigna memoria a un proceso
+            case 6: gestor.liberarMemoria(); break;   // Libera la memoria de un proceso
+            case 7: gestor.ejecutarProceso(); break;   // Ejecuta los procesos por prioridad
+            case 8: gestor.mostrarLista(); break;    // Muestra el estado actual del sistema
+            case 9: gestor.mostrarCola(); break;     // Cierra el programa
             case 10: break;
-            default: cout << "Opción no válida.\n"; break;
+            default: cout << "Opción no válida.\n"; break;   // Si se ingresa una opción incorrecta
         }
-    } while (opcion != 10);
+    } while (opcion != 10); // Repetimos el menú hasta que el usuario elija salir
 
-    return 0;
+    return 0; // Fin del programa
 }
