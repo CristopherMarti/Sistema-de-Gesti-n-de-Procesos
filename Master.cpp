@@ -163,7 +163,7 @@ struct NodoCola {
 
 // Variables globales que representan la cola
 NodoCola* frente = NULL;
-NodoCola* final = NULL; // No se usa en esta lógica, pero queda declarado igual
+
 
 // Función para encolar un proceso según su prioridad (de mayor a menor)
 void encolar(int id, int prioridad) {
