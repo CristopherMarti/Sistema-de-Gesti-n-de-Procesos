@@ -1,3 +1,7 @@
+// ==============================================
+// Proyecto: Gestor de Procesos con Estructuras Propias (Lista, Pila, Cola)
+// Semana 10 - Algoritmos de búsqueda, actualización y ordenación
+// ==============================================
 #include <iostream>
 #include <string>
 using namespace std;
@@ -5,41 +9,43 @@ using namespace std;
 // ================= ESTRUCTURAS PERSONALIZADAS ===================
 
 // ----------- Lista enlazada de procesos -----------
-
-// Estructura que representa un proceso en el sistema.
+// Nodo para representar un proceso en la lista enlazada
 struct NodoProceso {
-    int id;                 // Identificador único del proceso
+    int id;                 // Identificador del proceso
     string nombre;          // Nombre del proceso
-    int prioridad;          // Prioridad del proceso (puede usarse para planificadores)
-    int tamanoMemoria;      // Tamaño total de memoria que necesita el proceso
-    string estado;          // Estado del proceso (ej. "Nuevo", "Listo", "Ejecutando")
-    int memoriaAsignada;    // Cantidad de memoria asignada actualmente
-    NodoProceso* siguiente; // Puntero al siguiente proceso en la lista enlazada
+    int prioridad;          // Prioridad del proceso
+    int tamanoMemoria;      // Tamaño de memoria requerido por el proceso (KB)
+    string estado;          // Estado actual del proceso (Ej. Nuevo, En memoria, Listo)
+    int memoriaAsignada;    // Cantidad de memoria asignada al proceso (KB)
+    NodoProceso* siguiente; // Puntero al siguiente nodo en la lista
 };
 
-// Clase ListaProcesos que representa una lista enlazada simple de procesos.
+// Clase para manejar la lista enlazada de procesos
 class ListaProcesos {
 private:
     NodoProceso* cabeza; // Puntero al primer nodo de la lista
 
 public:
+    // Constructor que inicializa la lista vacía
     ListaProcesos() : cabeza(NULL) {}
 
-    // Inserta un nuevo proceso al final de la lista.
+    // Inserta un nuevo proceso al final de la lista
     void insertar(int id, string nombre, int prioridad, int tamano) {
         NodoProceso* nuevo = new NodoProceso{id, nombre, prioridad, tamano, "Nuevo", 0, NULL};
-        if (!cabeza) {
+        if (!cabeza) {  // Si la lista está vacía, el nuevo nodo será la cabeza
             cabeza = nuevo;
         } else {
+            // Recorre la lista hasta el último nodo
             NodoProceso* actual = cabeza;
             while (actual->siguiente)
                 actual = actual->siguiente;
+            // Inserta el nuevo nodo al final
             actual->siguiente = nuevo;
         }
         cout << "Proceso insertado correctamente.\n";
     }
 
-    // Busca un proceso en la lista por su ID.
+    // Busca un proceso por su ID y devuelve su nodo o NULL si no existe
     NodoProceso* buscar(int id) {
         NodoProceso* actual = cabeza;
         while (actual) {
@@ -49,26 +55,27 @@ public:
         return NULL;
     }
 
-    // Elimina un proceso de la lista según su ID.
+    // Elimina un proceso dado su ID si existe
     void eliminar(int id) {
-        if (!cabeza) return;
-        if (cabeza->id == id) {
+        if (!cabeza) return;  // Lista vacía, no hacer nada
+        if (cabeza->id == id) {  // Si el primer nodo es el que se quiere eliminar
             NodoProceso* temp = cabeza;
-            cabeza = cabeza->siguiente;
-            delete temp;
+            cabeza = cabeza->siguiente;  // Avanza la cabeza
+            delete temp;  // Libera memoria del nodo eliminado
             return;
         }
+        // Buscar el nodo anterior al que se va a eliminar
         NodoProceso* actual = cabeza;
         while (actual->siguiente && actual->siguiente->id != id)
             actual = actual->siguiente;
         if (actual->siguiente) {
             NodoProceso* temp = actual->siguiente;
-            actual->siguiente = temp->siguiente;
-            delete temp;
+            actual->siguiente = temp->siguiente;  // Salta el nodo a eliminar
+            delete temp;  // Libera memoria
         }
     }
 
-    // Muestra todos los procesos de la lista llamando a la función mostrar().
+    // Muestra la información de todos los procesos en la lista
     void mostrarTodos() {
         NodoProceso* actual = cabeza;
         while (actual) {
@@ -78,7 +85,7 @@ public:
         }
     }
 
-    // Muestra los datos de un solo proceso recibido como parámetro.
+    // Muestra la información de un proceso específico
     void mostrar(NodoProceso* p) {
         if (p) {
             cout << "ID: " << p->id << "\nNombre: " << p->nombre << "\nPrioridad: "
@@ -88,102 +95,153 @@ public:
         }
     }
 
-    // Retorna un puntero al primer proceso de la lista.
+    // Devuelve la cabeza de la lista
     NodoProceso* getCabeza() { return cabeza; }
 };
 
-// ----------- Cola personalizada -----------
+// ----------- Pila personalizada -----------
+// Nodo para la pila, que almacena IDs de procesos
+struct Nodo {
+    int id;         // ID del proceso almacenado
+    Nodo* siguiente; // Puntero al siguiente nodo en la pila
+};
 
+// Clase para manejar la pila de memoria
+class PilaMemoria {
+private:
+    Nodo* cima;      // Puntero a la cima de la pila
+    int maxTam;      // Tamaño máximo de la pila
+    int tamActual;   // Tamaño actual (cantidad de elementos)
+
+public:
+    // Constructor que inicializa la pila vacía con límite maxTam
+    PilaMemoria(int limite) : cima(NULL), maxTam(limite), tamActual(0) {}
+
+    // Verifica si la pila está llena
+    bool estaLlena() { return tamActual >= maxTam; }
+
+    // Verifica si la pila está vacía
+    bool estaVacia() { return cima == NULL; }
+
+    // Inserta un nuevo ID en la cima de la pila
+    void push(int id) {
+        if (estaLlena()) {
+            cout << "Pila de memoria llena.\n";
+            return;
+        }
+        Nodo* nuevo = new Nodo{id, cima}; // Nuevo nodo apunta a la cima actual
+        cima = nuevo;  // Nueva cima es el nuevo nodo
+        tamActual++;   // Incrementa el tamaño actual
+    }
+
+    // Elimina el nodo en la cima de la pila
+    void pop() {
+        if (estaVacia()) return;
+        Nodo* temp = cima;
+        cima = cima->siguiente; // La cima pasa a ser el siguiente nodo
+        delete temp;            // Libera memoria del nodo eliminado
+        tamActual--;            // Decrementa el tamaño actual
+    }
+
+    // Muestra los IDs de procesos almacenados en la pila
+    void mostrar() {
+        Nodo* actual = cima;
+        cout << "Procesos en memoria (de cima a base):\n";
+        while (actual) {
+            cout << "Proceso ID: " << actual->id << endl;
+            actual = actual->siguiente;
+        }
+    }
+};
+
+// ----------- Cola personalizada -----------
 struct NodoCola {
-    int id;                // Identificador del proceso
-    int prioridad;         // Prioridad del proceso
-    NodoCola* siguiente;   // Puntero al siguiente nodo en la cola
+    int id;             // ID del proceso
+    int prioridad;      // Prioridad del proceso
+    NodoCola* siguiente; // Puntero al siguiente nodo en la cola
 };
 
 class ColaPrioridad {
 private:
-    NodoCola* frente;      // Puntero al primer nodo de la cola (mayor prioridad)
-    NodoCola* final;       // Puntero al último nodo de la cola (no se usa en este código)
+    NodoCola* frente;  // Puntero al inicio de la cola
+    NodoCola* final;   // Puntero al final de la cola (no usado en lógica actual)
 
 public:
-    ColaPrioridad() : frente(NULL), final(NULL) {}
+    ColaPrioridad() : frente(NULL), final(NULL) {} // Constructor que inicializa ambos punteros a NULL
 
-    // Inserta un nuevo proceso en la cola respetando el orden de prioridad (mayor primero)
     void encolar(int id, int prioridad) {
-        NodoCola* nuevo = new NodoCola{id, prioridad, NULL};  // Crear nuevo nodo
-
+        NodoCola* nuevo = new NodoCola{id, prioridad, NULL}; // Crear nuevo nodo con datos
+        // Si la cola está vacía o la prioridad es mayor que la del frente
         if (!frente || prioridad > frente->prioridad) {
-            nuevo->siguiente = frente;  // Insertar al inicio
-            frente = nuevo;
+            nuevo->siguiente = frente;  // Nuevo nodo apunta al frente actual
+            frente = nuevo;             // Nuevo nodo se vuelve el frente
         } else {
             NodoCola* actual = frente;
+            // Buscar lugar correcto para insertar según prioridad (de mayor a menor)
             while (actual->siguiente && actual->siguiente->prioridad >= prioridad)
                 actual = actual->siguiente;
-
-            nuevo->siguiente = actual->siguiente;
-            actual->siguiente = nuevo;
+            nuevo->siguiente = actual->siguiente; // Enlazar nuevo nodo al siguiente
+            actual->siguiente = nuevo;             // Enlazar nodo actual al nuevo
         }
     }
 
-    // Elimina y procesa el nodo con mayor prioridad (el frente)
     void desencolar() {
-        if (!frente) {
-            cout << "Cola vacía.\n";
+        if (!frente) {              // Si la cola está vacía
+            cout << "Cola vacía.\n"; 
             return;
         }
-        NodoCola* temp = frente;
-        frente = frente->siguiente;
+        NodoCola* temp = frente;    // Guardar nodo que se va a desencolar
+        frente = frente->siguiente; // Avanzar el frente
         cout << "Ejecutando proceso con ID: " << temp->id << " y prioridad: " << temp->prioridad << endl;
-        delete temp;
+        delete temp;                // Liberar memoria del nodo desencolado
     }
 
-    // Muestra todos los nodos de la cola con sus IDs y prioridades
     void mostrar() {
-        NodoCola* actual = frente;
+        NodoCola* actual = frente;  // Comenzar desde el frente
         int pos = 1;
-        while (actual) {
+        while (actual) {            // Recorrer todos los nodos
             cout << pos++ << ". Proceso ID: " << actual->id << " - Prioridad: " << actual->prioridad << endl;
             actual = actual->siguiente;
         }
     }
 
-    // Retorna true si la cola está vacía
-    bool estaVacia() { return frente == NULL; }
+    bool estaVacia() { return frente == NULL; } // Verifica si la cola está vacía
 };
 
 // ================= GESTOR DE PROCESOS ===================
-
+// Clase que gestiona la lista de procesos, pila de memoria y cola de prioridad
 class GestorProcesos {
 private:
-    ListaProcesos lista;
-    ColaPrioridad cola;
-    int memoriaTotal;
-    int memoriaUsada;
+    ListaProcesos lista;   // Lista enlazada de procesos
+    PilaMemoria pila;      // Pila para gestión de memoria
+    ColaPrioridad cola;    // Cola para ejecución según prioridad
+    int memoriaTotal;      // Memoria total disponible (KB)
+    int memoriaUsada;      // Memoria actualmente asignada (KB)
 
 public:
-    GestorProcesos(int memTotal) : memoriaTotal(memTotal), memoriaUsada(0) {}
+    // Constructor que inicializa pila con límite 100 y memoria total dada
+    GestorProcesos(int memTotal) : pila(100), memoriaTotal(memTotal), memoriaUsada(0) {}
 
-    // Opción para insertar un nuevo proceso
+    // Inserta un nuevo proceso, evita IDs duplicados, y lo encola
     void insertarProceso() {
         int id, prioridad, tamano;
         string nombre;
 
         cout << "Ingrese ID del proceso: "; cin >> id;
-        if (lista.buscar(id)) {
+        if (lista.buscar(id)) {  // Verifica si ID ya existe
             cout << "Ya existe un proceso con ese ID.\n";
             return;
         }
-
         cin.ignore();
         cout << "Ingrese nombre del proceso: "; getline(cin, nombre);
         cout << "Ingrese prioridad (1-10): "; cin >> prioridad;
         cout << "Ingrese tamaño de memoria (KB): "; cin >> tamano;
 
-        lista.insertar(id, nombre, prioridad, tamano);
-        cola.encolar(id, prioridad);
+        lista.insertar(id, nombre, prioridad, tamano);  // Inserta en la lista
+        cola.encolar(id, prioridad);                      // Encola por prioridad
     }
 
-    // Opción para eliminar un proceso
+    // Elimina un proceso dado su ID
     void eliminarProceso() {
         int id;
         cout << "Ingrese ID del proceso a eliminar: "; cin >> id;
@@ -191,7 +249,7 @@ public:
         cout << "Proceso eliminado si existía.\n";
     }
 
-    // Opción para buscar un proceso por su ID
+    // Busca un proceso por ID y muestra sus datos
     void buscarProceso() {
         int id;
         cout << "Ingrese ID del proceso a buscar: "; cin >> id;
@@ -200,7 +258,7 @@ public:
         else cout << "No encontrado.\n";
     }
 
-    // Opción para modificar la prioridad de un proceso
+    // Modifica la prioridad de un proceso existente
     void modificarPrioridad() {
         int id, prioridad;
         cout << "Ingrese ID del proceso: "; cin >> id;
@@ -214,105 +272,111 @@ public:
         }
     }
 
-    // Opción para asignar memoria a un proceso
+    // Asigna memoria a un proceso si hay suficiente memoria disponible
     void asignarMemoria() {
         int id;
         cout << "Ingrese ID del proceso: "; cin >> id;
         NodoProceso* p = lista.buscar(id);
-
         if (!p) {
             cout << "Proceso no encontrado.\n";
             return;
         }
-
         if (p->memoriaAsignada > 0) {
             cout << "Ya tiene memoria asignada.\n";
             return;
         }
-
         if (memoriaUsada + p->tamanoMemoria > memoriaTotal) {
             cout << "Memoria insuficiente.\n";
             return;
         }
-
-        memoriaUsada += p->tamanoMemoria;
-        p->memoriaAsignada = p->tamanoMemoria;
-        p->estado = "En memoria";
+        memoriaUsada += p->tamanoMemoria;  // Actualiza memoria usada
+        p->memoriaAsignada = p->tamanoMemoria;  // Asigna memoria al proceso
+        p->estado = "En memoria";  // Cambia estado
+        pila.push(p->id);  // Añade proceso a la pila de memoria
         cout << "Memoria asignada.\n";
     }
 
-    // Opción para liberar memoria de un proceso
+    // Libera la memoria asignada a un proceso y lo remueve de la pila
     void liberarMemoria() {
         int id;
         cout << "Ingrese ID del proceso: "; cin >> id;
         NodoProceso* p = lista.buscar(id);
-
         if (!p || p->memoriaAsignada == 0) {
             cout << "Proceso no encontrado o sin memoria asignada.\n";
             return;
         }
-
-        memoriaUsada -= p->memoriaAsignada;
-        p->memoriaAsignada = 0;
-        p->estado = "Nuevo";
+        memoriaUsada -= p->memoriaAsignada;  // Reduce memoria usada
+        p->memoriaAsignada = 0;               // Libera memoria del proceso
+        p->estado = "Listo";                  // Cambia estado a listo
+        pila.pop();                          // Remueve de la pila (LIFO)
         cout << "Memoria liberada.\n";
     }
 
-    // Opción para ejecutar el proceso con mayor prioridad
-    void ejecutarProceso() {
+    // Ejecuta todos los procesos en cola según su prioridad
+    void ejecutarProcesos() {
         if (cola.estaVacia()) {
-            cout << "No hay procesos en la cola.\n";
+            cout << "No hay procesos en cola.\n";
             return;
         }
-        cola.desencolar();
+        cout << "\n== Ejecutando procesos por prioridad ==\n";
+        while (!cola.estaVacia()) {
+            cola.desencolar();
+        }
     }
 
-    // Mostrar la lista completa de procesos
-    void mostrarLista() {
+    // Muestra el estado actual del sistema: memoria, lista, pila y cola
+    void mostrarEstados() {
+        cout << "\n== ESTADO DEL SISTEMA ==\n";
+        cout << "Memoria total: " << memoriaTotal << " KB\n";
+        cout << "Memoria usada: " << memoriaUsada << " KB\n";
+        cout << "Memoria disponible: " << memoriaTotal - memoriaUsada << " KB\n\n";
+
+        cout << "-- Procesos en lista --\n";
         lista.mostrarTodos();
-    }
 
-    // Mostrar la cola de procesos con prioridad
-    void mostrarCola() {
+        cout << "-- Pila de memoria --\n";
+        pila.mostrar();
+
+        cout << "-- Cola de prioridad --\n";
         cola.mostrar();
     }
 };
 
-// ================= FUNCION PRINCIPAL ===================
+// ========== MANTENER MENÚ PRINCIPAL ORIGINAL ===========
+// Función para mostrar el menú principal
+void mostrarMenu() {
+    cout << "\n=== Gestor de Procesos ===" << endl;
+    cout << "1. Crear nuevo proceso" << endl;
+    cout << "2. Eliminar proceso por ID" << endl;
+    cout << "3. Buscar proceso" << endl;
+    cout << "4. Modificar prioridad de proceso" << endl;
+    cout << "5. Asignar memoria a proceso" << endl;
+    cout << "6. Liberar memoria de proceso" << endl;
+    cout << "7. Ejecutar procesos por prioridad" << endl;
+    cout << "8. Mostrar estados del sistema" << endl;
+    cout << "9. Salir" << endl;
+    cout << "Seleccione una opción: ";
+}
 
-    // Este menú se muestra cada vez que el usuario debe elegir una acción
+// Función principal
 int main() {
-    GestorProcesos gestor(1024); // Creamos un objeto del gestor con 1024 KB de memoria disponible
+    GestorProcesos gestor(1024); // Inicializa gestor con 1024 KB de memoria total
     int opcion;
-
     do {
-        cout << "\nGestor de Procesos\n";
-        cout << "1. Insertar proceso\n";
-        cout << "2. Eliminar proceso\n";
-        cout << "3. Buscar proceso\n";
-        cout << "4. Modificar prioridad\n";
-        cout << "5. Asignar memoria\n";
-        cout << "6. Liberar memoria\n";
-        cout << "7. Ejecutar proceso\n";
-        cout << "8. Mostrar lista de procesos\n";
-        cout << "9. Mostrar cola de prioridad\n";
-        cout << "10. Salir\n";
-        cout << "Seleccione una opción: ";
-        
+        mostrarMenu();
+        cin >> opcion;
         switch (opcion) {
-            case 1: gestor.insertarProceso(); break; // Crea un nuevo proceso
-            case 2: gestor.eliminarProceso(); break;  // Elimina un proceso existente
-            case 3: gestor.buscarProceso(); break; // Busca un proceso por ID
-            case 4: gestor.modificarPrioridad(); break;  // Cambia la prioridad de un proceso
-            case 5: gestor.asignarMemoria(); break;     // Asigna memoria a un proceso
-            case 6: gestor.liberarMemoria(); break;   // Libera la memoria de un proceso
-            case 7: gestor.ejecutarProceso(); break;   // Ejecuta los procesos por prioridad
-            case 8: gestor.mostrarLista(); break;    // Muestra el estado actual del sistema
-            case 9: gestor.mostrarCola(); break;     // Cierra el programa
-            case 10: break;
-            default: cout << "Opción no válida.\n"; break;   // Si se ingresa una opción incorrecta
+            case 1: gestor.insertarProceso(); break;
+            case 2: gestor.eliminarProceso(); break;
+            case 3: gestor.buscarProceso(); break;
+            case 4: gestor.modificarPrioridad(); break;
+            case 5: gestor.asignarMemoria(); break;
+            case 6: gestor.liberarMemoria(); break;
+            case 7: gestor.ejecutarProcesos(); break;
+            case 8: gestor.mostrarEstados(); break;
+            case 9: cout << "Saliendo...\n"; break;
+            default: cout << "Opción inválida.\n"; break;
         }
-    } while (opcion != 10); // Repetimos el menú hasta que el usuario elija salir
-
-    return 0; // Fin del programa
+    } while (opcion != 9);
+    return 0;
 }
