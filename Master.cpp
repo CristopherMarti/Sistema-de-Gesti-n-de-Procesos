@@ -222,9 +222,196 @@ public:
     bool estaVacia() { return frente == NULL; }
 };
 // ================= GESTOR DE PROCESOS ===================
+class GestorProcesos {
+private:
+    ListaProcesos lista;   // Aquí se guarda la lista de todos los procesos registrados
+    PilaMemoria pila;      // Esta pila nos ayuda a controlar la memoria que se va asignando a los procesos
+    ColaPrioridad cola;    // Cola para gestionar los procesos según su prioridad
+    int memoriaTotal;      // Capacidad total de memoria del sistema
+    int memoriaUsada;      // Cuánta memoria está actualmente en uso
 
+public:
+    // Constructor que inicializa la memoria total y define la capacidad de la pila
+    GestorProcesos(int memTotal) : pila(100), memoriaTotal(memTotal), memoriaUsada(0) {}
+
+    // Permite ingresar un nuevo proceso con sus datos: ID, nombre, prioridad y tamaño
+    void insertarProceso() {
+        int id, prioridad, tamano;
+        string nombre;
+
+        cout << "Ingrese ID del proceso: "; cin >> id;
+
+        // Verificamos que no se repita el ID
+        if (lista.buscar(id)) {
+            cout << "Ya existe un proceso con ese ID.\n";
+            return;
+        }
+
+        cin.ignore();  // Limpiamos el buffer del teclado
+        cout << "Ingrese nombre del proceso: "; getline(cin, nombre);
+        cout << "Ingrese prioridad (1-10): "; cin >> prioridad;
+        cout << "Ingrese tamaño de memoria (KB): "; cin >> tamano;
+
+        // Insertamos el proceso en la lista y lo agregamos a la cola de prioridad
+        lista.insertar(id, nombre, prioridad, tamano);
+        cola.encolar(id, prioridad);
+    }
+
+    // Elimina un proceso existente según su ID
+    void eliminarProceso() {
+        int id;
+        cout << "Ingrese ID del proceso a eliminar: "; cin >> id;
+        lista.eliminar(id);
+        cout << "Proceso eliminado si existía.\n";
+    }
+
+    // Permite buscar un proceso por su ID y mostrar sus datos si lo encuentra
+    void buscarProceso() {
+        int id;
+        cout << "Ingrese ID del proceso a buscar: "; cin >> id;
+        NodoProceso* p = lista.buscar(id);
+        if (p) lista.mostrar(p);
+        else cout << "No encontrado.\n";
+    }
+
+    // Modifica la prioridad de un proceso ya existente
+    void modificarPrioridad() {
+        int id, prioridad;
+        cout << "Ingrese ID del proceso: "; cin >> id;
+        NodoProceso* p = lista.buscar(id);
+        if (p) {
+            cout << "Nueva prioridad: "; cin >> prioridad;
+            p->prioridad = prioridad;
+            cout << "Prioridad actualizada.\n";
+        } else {
+            cout << "No encontrado.\n";
+        }
+    }
+
+    // Asigna memoria a un proceso si hay suficiente disponible
+    void asignarMemoria() {
+        int id;
+        cout << "Ingrese ID del proceso: "; cin >> id;
+        NodoProceso* p = lista.buscar(id);
+
+        if (!p) {
+            cout << "Proceso no encontrado.\n";
+            return;
+        }
+
+        // Verificamos si ya se le asignó memoria antes
+        if (p->memoriaAsignada > 0) {
+            cout << "Ya tiene memoria asignada.\n";
+            return;
+        }
+
+        // Validamos que haya suficiente memoria disponible
+        if (memoriaUsada + p->tamanoMemoria > memoriaTotal) {
+            cout << "Memoria insuficiente.\n";
+            return;
+        }
+
+        // Se le asigna memoria al proceso y se actualizan los valores
+        memoriaUsada += p->tamanoMemoria;
+        p->memoriaAsignada = p->tamanoMemoria;
+        p->estado = "En memoria";
+        pila.push(p->id); // Guardamos el proceso en la pila de memoria
+        cout << "Memoria asignada.\n";
+    }
+
+    // Libera la memoria que estaba usando un proceso específico
+    void liberarMemoria() {
+        int id;
+        cout << "Ingrese ID del proceso: "; cin >> id;
+        NodoProceso* p = lista.buscar(id);
+
+        if (!p || p->memoriaAsignada == 0) {
+            cout << "Proceso no encontrado o sin memoria asignada.\n";
+            return;
+        }
+
+        // Se libera la memoria usada y se actualiza el estado del proceso
+        memoriaUsada -= p->memoriaAsignada;
+        p->memoriaAsignada = 0;
+        p->estado = "Listo";
+        pila.pop(); // Quitamos el proceso de la pila de memoria
+        cout << "Memoria liberada.\n";
+    }
+
+    // Ejecuta los procesos que están en la cola de prioridad, uno por uno
+    void ejecutarProcesos() {
+        if (cola.estaVacia()) {
+            cout << "No hay procesos en cola.\n";
+            return;
+        }
+
+        cout << "\n== Ejecutando procesos por prioridad ==\n";
+        while (!cola.estaVacia()) {
+            cola.desencolar();  // Ejecuta (o más bien "saca") el proceso con mayor prioridad
+        }
+    }
+
+    // Muestra el estado general del sistema: memoria, procesos, pila y cola
+    void mostrarEstados() {
+        cout << "\n== ESTADO DEL SISTEMA ==\n";
+        cout << "Memoria total: " << memoriaTotal << " KB\n";
+        cout << "Memoria usada: " << memoriaUsada << " KB\n";
+        cout << "Memoria disponible: " << memoriaTotal - memoriaUsada << " KB\n\n";
+
+        cout << "-- Procesos en lista --\n";
+        lista.mostrarTodos();
+
+        cout << "-- Pila de memoria --\n";
+        pila.mostrar();
+
+        cout << "-- Cola de prioridad --\n";
+        cola.mostrar();
+    }
+};
 
 
 // ========== MENÚ PRINCIPAL ORIGINAL ===========
 
+void mostrarMenu() {
+    // Este menú se muestra cada vez que el usuario debe elegir una acción
+    cout << "\n=== Gestor de Procesos ===" << endl;
+    cout << "1. Crear nuevo proceso" << endl;
+    cout << "2. Eliminar proceso por ID" << endl;
+    cout << "3. Buscar proceso" << endl;
+    cout << "4. Modificar prioridad de proceso" << endl;
+    cout << "5. Asignar memoria a proceso" << endl;
+    cout << "6. Liberar memoria de proceso" << endl;
+    cout << "7. Ejecutar procesos por prioridad" << endl;
+    cout << "8. Mostrar estados del sistema" << endl;
+    cout << "9. Salir" << endl;
+    cout << "Seleccione una opción: ";
+}
+
+int main() {
+    GestorProcesos gestor(1024); // Creamos un objeto del gestor con 1024 KB de memoria disponible
+    int opcion;
+
+    // Este ciclo se repite hasta que el usuario elige salir (opción 9)
+    do {
+        mostrarMenu();       // Mostramos el menú con las opciones
+        cin >> opcion;       // Leemos la opción que el usuario ingresó
+
+        // Según la opción seleccionada, llamamos al método correspondiente
+        switch (opcion) {
+            case 1: gestor.insertarProceso(); break;         // Crea un nuevo proceso
+            case 2: gestor.eliminarProceso(); break;         // Elimina un proceso existente
+            case 3: gestor.buscarProceso(); break;           // Busca un proceso por ID
+            case 4: gestor.modificarPrioridad(); break;      // Cambia la prioridad de un proceso
+            case 5: gestor.asignarMemoria(); break;          // Asigna memoria a un proceso
+            case 6: gestor.liberarMemoria(); break;          // Libera la memoria de un proceso
+            case 7: gestor.ejecutarProcesos(); break;        // Ejecuta los procesos por prioridad
+            case 8: gestor.mostrarEstados(); break;          // Muestra el estado actual del sistema
+            case 9: cout << "Saliendo...\n"; break;          // Cierra el programa
+            default: cout << "Opción inválida.\n"; break;    // Si se ingresa una opción incorrecta
+        }
+
+    } while (opcion != 9); // Repetimos el menú hasta que el usuario elija salir
+
+    return 0; // Fin del programa
+}
 
