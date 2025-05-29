@@ -4,28 +4,40 @@
 using namespace std;
 
 // ----------- Lista enlazada de procesos -----------
+// Estructura que representa un proceso en el sistema.
+// Contiene información básica como id, nombre, prioridad, tamaño de memoria, 
+// estado, cantidad de memoria asignada y un puntero al siguiente nodo.
 struct NodoProceso {
-    int id;
-    string nombre;
-    int prioridad;
-    int tamanoMemoria;
-    string estado;
-    int memoriaAsignada;
-    NodoProceso* siguiente;
+    int id;                 // Identificador único del proceso
+    string nombre;          // Nombre del proceso
+    int prioridad;          // Prioridad del proceso (puede usarse para planificadores)
+    int tamanoMemoria;      // Tamaño total de memoria que necesita el proceso
+    string estado;          // Estado del proceso (ej. "Nuevo", "Listo", "Ejecutando")
+    int memoriaAsignada;    // Cantidad de memoria asignada actualmente
+    NodoProceso* siguiente; // Puntero al siguiente proceso en la lista enlazada
 };
+
+//Clase ListaProcesos que representa una lista enlazada simple de procesos.
+//Permite insertar, buscar, eliminar y mostrar procesos.
 
 class ListaProcesos {
 private:
-    NodoProceso* cabeza;
+    NodoProceso* cabeza; // Puntero al primer nodo de la lista
 
 public:
+    // Constructor: inicializa la lista vacía
     ListaProcesos() : cabeza(NULL) {}
+
+    //Inserta un nuevo proceso al final de la lista.
+    //Recibe como parámetros los atributos del proceso.
 
     void insertar(int id, string nombre, int prioridad, int tamano) {
         NodoProceso* nuevo = new NodoProceso{id, nombre, prioridad, tamano, "Nuevo", 0, NULL};
         if (!cabeza) {
+            // Si la lista está vacía, el nuevo proceso es la cabeza
             cabeza = nuevo;
         } else {
+            // Recorre la lista hasta el último nodo y lo enlaza
             NodoProceso* actual = cabeza;
             while (actual->siguiente)
                 actual = actual->siguiente;
@@ -33,6 +45,9 @@ public:
         }
         cout << "Proceso insertado correctamente.\n";
     }
+
+    //Busca un proceso en la lista por su ID.
+    //Retorna un puntero al nodo si lo encuentra, o NULL si no existe.
 
     NodoProceso* buscar(int id) {
         NodoProceso* actual = cabeza;
@@ -43,23 +58,34 @@ public:
         return NULL;
     }
 
+    //Elimina un proceso de la lista según su ID.
+    //Ajusta los punteros para mantener la integridad de la lista.
+
     void eliminar(int id) {
-        if (!cabeza) return;
+        if (!cabeza) return; // Lista vacía
+
+        // Si el proceso a eliminar está al inicio
         if (cabeza->id == id) {
             NodoProceso* temp = cabeza;
             cabeza = cabeza->siguiente;
             delete temp;
             return;
         }
+
+        // Recorre la lista buscando el nodo anterior al que se desea eliminar
         NodoProceso* actual = cabeza;
         while (actual->siguiente && actual->siguiente->id != id)
             actual = actual->siguiente;
+
+        // Si se encontró el nodo a eliminar
         if (actual->siguiente) {
             NodoProceso* temp = actual->siguiente;
             actual->siguiente = temp->siguiente;
             delete temp;
         }
     }
+
+    //Muestra todos los procesos de la lista llamando a la función mostrar().
 
     void mostrarTodos() {
         NodoProceso* actual = cabeza;
@@ -70,6 +96,8 @@ public:
         }
     }
 
+    //Muestra los datos de un solo proceso recibido como parámetro.
+
     void mostrar(NodoProceso* p) {
         if (p) {
             cout << "ID: " << p->id << "\nNombre: " << p->nombre << "\nPrioridad: "
@@ -78,6 +106,9 @@ public:
                  << "\nEstado: " << p->estado << "\n";
         }
     }
+
+    //Retorna un puntero al primer proceso de la lista.
+    //Útil para recorridos externos u operaciones adicionales.
 
     NodoProceso* getCabeza() { return cabeza; }
 };
