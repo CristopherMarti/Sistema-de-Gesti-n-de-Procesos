@@ -1,6 +1,5 @@
 // ==============================================
 // Proyecto: Gestor de Procesos con Estructuras Propias (Lista, Pila, Cola)
-// Semana 10 - Algoritmos de búsqueda, actualización y ordenación
 // ==============================================
 
 #include <iostream>     // Para entrada y salida estándar
@@ -344,6 +343,7 @@ public:
     }
 };
 
+
 // ========== MENÚ PRINCIPAL ==========
 
 // Mostrar opciones del menú principal
@@ -363,6 +363,7 @@ void mostrarMenu() {
 
 // Función principal que ejecuta el programa
 int main() {
+	setlocale(LC_CTYPE,"Spanish");
     GestorProcesos gestor(1024); // Creamos un objeto del gestor con 1024 KB de memoria disponible
     int opcion;
 
